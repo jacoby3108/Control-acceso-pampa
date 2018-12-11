@@ -22,6 +22,7 @@ extern STATE S_ilde[];
 extern STATE S_opening_door[];
 extern STATE S_delete_card[];
 extern STATE S_add_card[];
+extern STATE S_closing_door[];
 
 
 
@@ -45,15 +46,20 @@ static STATE *p2state=NULL;
 
 
 /* HABILITAR ESTO
-static void open_door(void);
-static void close_door(void);
-static void erase_table(void);
-static void blink_led(void);
+
+
+
+
+*/
+static void turn_leds_off(void);
 static void erase_card(void);
 static void add_card(void);
 static void do_nothing(void);
-*/
+static void erase_table(void);
+static void blink_led(void);
 
+static void do_nothing1(void);
+static void restore_card_reader(void);
 //==============================================
 
 #define MAX_CARD 20
@@ -73,11 +79,11 @@ u16 search_card_table(u16 card_nr,u16 *address);
 STATE S_ilde[]=
 {
   {E_REGISTERED_CARD,S_opening_door,trigger_door_to_open}, // if a registered card was recieved open the door
-  {E_UNKOWN_CARD,S_ilde,do_nothing},			// Unknown cards will be rejected
+  {E_UNKOWN_CARD,S_ilde,turn_leds_off},			// Unknown cards will be rejected
   {E_SUP_ERASE_ALL_CARD,S_ilde,erase_table},	// Erase all registered users
   {E_SUP_ERASE_CARD,S_delete_card,blink_led},	// Erase an existing card
   {E_SUP_ADD_CARD,S_add_card,blink_led},		// Add a new card
-  {E_UNKNOWN_EV,S_ilde,do_nothing}   		// Unknown Event
+  {E_UNKNOWN_EV,S_ilde,turn_leds_off}   		// Unknown Event
 };
 
 /*** Opening_door State ***/
@@ -85,12 +91,20 @@ STATE S_ilde[]=
 STATE S_opening_door[]=
 {
 
-	{E_TIME_OUT,S_ilde,trigger_door_to_close}, // if Timeout close door
+	{E_TIME_OUT,S_closing_door,trigger_door_to_close}, // if Timeout close door
 	{E_REGISTERED_CARD,S_opening_door,Extend_open_delay},//Renew delay if a card is detected while in opening door state
-	{E_UNKNOWN_EV,S_ilde,do_nothing}   		// Unknown Event
+	{E_UNKNOWN_EV,S_ilde,turn_leds_off}   		// Unknown Event
 
 };
 
+STATE S_closing_door[]=
+{
+
+    {E_TIME_OUT,S_ilde,restore_card_reader}, // if Timeout close door
+    {E_REGISTERED_CARD,S_closing_door,do_nothing1},
+    {E_UNKNOWN_EV,S_ilde,turn_leds_off}        // Unknown Event
+
+};
 
 
 
@@ -99,9 +113,9 @@ STATE S_opening_door[]=
 
 STATE S_delete_card[]=
 {
-	{E_TIME_OUT,S_ilde,do_nothing},
+	{E_TIME_OUT,S_ilde,turn_leds_off},
 	{E_REGISTERED_CARD,S_ilde,erase_card},
-	{E_UNKNOWN_EV,S_ilde,do_nothing}   		// Unknown Event
+	{E_UNKNOWN_EV,S_ilde,turn_leds_off}   		// Unknown Event
 
 };
 
@@ -113,9 +127,9 @@ STATE S_delete_card[]=
 
 STATE S_add_card[] =
 {
-	{E_TIME_OUT,S_ilde,do_nothing},     	// if time elapsed abort
+	{E_TIME_OUT,S_ilde,turn_leds_off},     	// if time elapsed abort
 	{E_NEW_CARD,S_ilde,add_card},    		// if a new card was received it will be added
-	{E_UNKNOWN_EV,S_ilde,do_nothing}   	// Unknown Event
+	{E_UNKNOWN_EV,S_ilde,turn_leds_off}   	// Unknown Event
 };
 
 
@@ -141,25 +155,6 @@ void store_state(STATE *p2new_state)
 ///=========Rutinas de accion===============
 
 
-void open_door(void)
-{
-
-
-		OpenDoor();
- 		flash_led(GREEN,100,0);
- 		Timer_Set_Delay(2000);	//2seg
-
-
-
-}
-
-void close_door(void)
-{
-
-	// LatchKey off
-	CloseDoor();
-	led_off(RED);
-}
 
 void erase_table(void)
 {
@@ -238,12 +233,44 @@ void blink_led(void)						// Used to signal that on operation is in progress
 	 Timer_Set_Delay(3000);	//3seg
 }
 
-
-void do_nothing(void)						// Just That :)
+void do_nothing(void)                       // Just That :)
 {
 
-	led_off(GREEN);
-	led_off(RED);
+//led_on(GREEN);
+//  led_off(RED);
+}
+
+
+
+
+void do_nothing1(void)                       // Just That :)
+{
+ static int t=0;
+ if(t)
+ {
+ led_on(GREEN);
+  t=0;
+ }
+ else
+ {
+     led_off(GREEN);
+      t=1;
+ }
+
+//  led_off(RED);
+}
+
+void turn_leds_off(void)
+{
+
+  led_off(GREEN);
+  led_off(RED);
+}
+
+void restore_card_reader(void)
+{
+    enable_card_reader();
+    turn_leds_off();
 }
 
 

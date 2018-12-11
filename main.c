@@ -101,6 +101,7 @@ int main(void) {
 
     QueueInit();
 	set_init_state(); 	// Inicializo la FSM con el estado inicial
+	enable_card_reader();
 
 
     _BIS_SR(GIE); // Enable General interrupts

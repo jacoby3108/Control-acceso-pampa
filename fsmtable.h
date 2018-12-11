@@ -20,6 +20,7 @@ void store_state(STATE *);
 /// estos protos son para probar de main solamente
 // despues borrarlos y habilitar en el .C
 
+/*
 void open_door(void);
 void close_door(void);
 void erase_table(void);
@@ -27,6 +28,7 @@ void blink_led(void);
 void erase_card(void);
 void add_card(void);
 void do_nothing(void);
+*/
 
 // EVENTS
 

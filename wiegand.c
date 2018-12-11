@@ -14,6 +14,7 @@ static unsigned char count;
 static unsigned long int data;
 static unsigned long int temp;
 static unsigned int watchdog_counter;
+static unsigned int card_enabled=1;
 
 #define WIEGAND_BIT_LENGHT 26
 
@@ -48,13 +49,15 @@ __interrupt void isr_wiegand(void)
 	if(	P1IFG & WIEGAND_0 )
 	{
 
-		P1IFG &=~WIEGAND_0;  // Clear Flag
 
+		P1IFG &=~WIEGAND_0;  // Clear Flag
+		if(card_enabled){
 //		P1OUT = RED | PULLUPS;
-		if (count)					// Avoid process a new card if previos card was not read by main
-		count--;
-		data<<=1;
-		data|=0;
+		    if (count)					// Avoid process a new card if previos card was not read by main
+		        count--;
+		    data<<=1;
+		    data|=0;
+		}
 	}
 
 
@@ -64,15 +67,26 @@ __interrupt void isr_wiegand(void)
 	{
 
 		P1IFG &=~WIEGAND_1;
-
+		if(card_enabled){
 //		P1OUT = GREEN | PULLUPS;
-		if (count)						// Avoid process a new card if previos card was not read by main
-		count--;
-		data<<=1;
-		data|=1;
+		    if (count)						// Avoid process a new card if previos card was not read by main
+		        count--;
+		    data<<=1;
+		    data|=1;
+		}
 	}
 
 
+}
+
+void enable_card_reader(void)
+{
+        card_enabled=1;
+}
+
+void disable_card_reader(void)
+{
+        card_enabled=0;
 }
 
 

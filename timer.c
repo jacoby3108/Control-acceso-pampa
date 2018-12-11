@@ -117,8 +117,8 @@ __interrupt void isr_timer(void)
 
 void TAOI_handler(void)		// hardware interrupt handler (10ms)
 {
-///	P1OUT ^= GREEN;			// for debug
-    _BIS_SR(GIE);   // Re Enable General interrupts
+//	P1OUT ^= GREEN;			// for debug
+ //   _BIS_SR(GIE);   // Re Enable General interrupts
 
 	if (timer){							  // if software timer has not expired
 		timer--;						  // update count
@@ -129,7 +129,7 @@ void TAOI_handler(void)		// hardware interrupt handler (10ms)
 
 	isr_led();
 	isr_door();
-	isr_card();
+///	isr_card();
 
 
 }
@@ -222,7 +222,7 @@ UINT Timer_Get_Status(void)
  * When event was already dispatched (we got too late) FSM has
  * can block the event.
 */
-UINT Timer_Kill(void)
+UINT Timer_Kill_1(void)
 {
 
 	_BIC_SR(GIE); 		// Disable General interrupts ( do atomic !!!!!!!!!!!!!!!!!!!)
