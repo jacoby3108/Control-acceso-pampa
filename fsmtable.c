@@ -62,7 +62,7 @@ static void do_nothing1(void);
 static void restore_card_reader(void);
 //==============================================
 
-#define MAX_CARD 20
+#define MAX_CARD 100         //24LC256  256Kbit 32K x 8  o sea 16K Words
 
 void EE_Clear(void);
 void EE_Write_Card(u16 address,u16 *pdata);

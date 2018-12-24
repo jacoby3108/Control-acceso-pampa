@@ -15,7 +15,7 @@
 static UINT door_timer=0;
 #define DOOR_PULSE_WIDTH  1000  // 1 seg  Pulse width to close the door
 #define TIME_DOOR_STAYS_OPEN  15000 // 15 seg Time to wait before send a command to close the door
-#define TIME_DOOR_TILL_CLOSED 12000 // 12seg Time used by the door to close
+#define TIME_DOOR_TILL_CLOSED 16000 // 16 seg Time used by the door to close 13 i enough
 
 void init_door(void)
 {
